@@ -26,15 +26,19 @@ const App = () => {
         setTimeout(() => setStartAll(false), 100);  // reset after a short delay
     };
 
+    const deleteRunner = (runnerName) => {
+        const filteredRunners = runners.filter(runner => runner !== runnerName);
+        setRunners(filteredRunners);
+    };
 
     return ( 
         <View style={styles.container}> 
             <Text style={styles.header}> 
-                Emily's App for Runners 
+                Stopwatch App 
             </Text>
             <TextInput
                 style={styles.input}
-                placeholder="Type new runner name here!"
+                placeholder="Add new runner stopwatch!"
                 onChangeText={newText => setName(newText)}
                 defaultValue={name}
             />
@@ -59,7 +63,9 @@ const App = () => {
                         {length: STOPWATCH_HEIGHT, offset: STOPWATCH_HEIGHT * index, index}
                     )}
                     renderItem={({ item }) => (
-                        <Stopwatch runnerName={item} startExternally={startAll} />
+                        <Stopwatch runnerName={item} 
+                        startExternally={startAll} 
+                        onDelete={() => deleteRunner(item)} />
                     )}
                 />   
             </SafeAreaView>
@@ -103,7 +109,9 @@ const styles = StyleSheet.create({
     }, 
     input: {
         margin: 15,
+        padding: 5,
         height: 40,
+        width: 200,
         borderColor: '#7a42f4',
         borderWidth: 1
      },

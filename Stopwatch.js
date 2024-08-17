@@ -8,7 +8,7 @@ const timestamp = {
     milliseconds: 0
 }
   
-const Stopwatch = ({runnerName, startExternally}) => { 
+const Stopwatch = ({runnerName, startExternally, onDelete}) => { 
     // State and refs to manage time and stopwatch status 
     const [time, setTime] = useState(0); 
     const [minutes, setMinutes] = useState(0); 
@@ -76,19 +76,21 @@ const Stopwatch = ({runnerName, startExternally}) => {
         setHaveLapTimes(false);
     }; 
     // Function to resume the stopwatch 
-    const resumeStopwatch = () => { 
-        startTimeRef.current = Date.now() - time * 1000; 
+    const resumeStopwatch = () => {
+        // saving the start time in hundreths of a second
+        startTimeRef.current = Date.now() - time * 10; 
+        // what we are doing here. is running the set time function on an interval, and saving a reference to the interval so that we can stop the funciton when we pause/reset
         intervalRef.current = setInterval(() => {
             const thisTime =  Math.floor((Date.now() -  
             startTimeRef.current) / 10);
             setTime(thisTime);
             const thisMinutes = Math.floor(thisTime / 6000);
             setMinutes(thisMinutes);
-            const thisSeconds = Math.floor(time - thisMinutes * 6000);
+            const thisSeconds = Math.floor((thisTime - thisMinutes * 6000) / 100);
             setSeconds(thisSeconds);
-            setCentiseconds(Math.floor((time - thisMinutes * 6000) - thisSeconds * 100));
-        }, 10); 
-        setRunning(true); 
+            setCentiseconds((thisTime - thisMinutes * 6000) - thisSeconds * 100);
+        }, 10); // changing from  1000 to 10 to change interval every centisecond
+        setRunning(true);  
     }; 
   
     return ( 
@@ -160,8 +162,16 @@ const Stopwatch = ({runnerName, startExternally}) => {
                             Resume 
                         </Text> 
                     </TouchableOpacity> 
-                )} 
-            </View> 
+                )}
+                            {/* Delete Button */}
+            <TouchableOpacity 
+                style={[styles.button, styles.deleteButton]} 
+                onPress={onDelete} 
+            > 
+                <Text style={styles.buttonText}>Delete</Text> 
+            </TouchableOpacity>  
+            </View>
+
         </View> 
     ); 
 }; 
@@ -236,7 +246,12 @@ const styles = StyleSheet.create({
     lapButton: { 
         backgroundColor: '#40E0D0', 
         marginLeft: 10,
-    }, 
+    },
+    deleteButton: {
+        backgroundColor: 'red',
+        marginLeft: 10,
+        padding: 10,
+    },
     buttonText: { 
         color: 'white', 
         fontSize: 16, 
