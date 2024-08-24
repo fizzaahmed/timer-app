@@ -2,13 +2,14 @@ import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Button, FlatList }  
     from 'react-native'; 
 import Stopwatch from './Stopwatch.js';
-  
+import Runner from './Runner.js';
+
 const App = () => {  
     const [numRunners, setNumRunners] = useState(0); 
     const [runners, setRunners] = useState([]);
     const [name, setName] = useState('');
     const [startAll, setStartAll] = useState(false);
-    const STOPWATCH_HEIGHT = 10; 
+    const RUNNER_HEIGHT = 10; 
 
     const addRunner = () => { 
         if (runners.length == 0){
@@ -34,11 +35,12 @@ const App = () => {
     return ( 
         <View style={styles.container}> 
             <Text style={styles.header}> 
-                Stopwatch App 
+                Stopwatch App
             </Text>
+            <Stopwatch />
             <TextInput
                 style={styles.input}
-                placeholder="Add new runner stopwatch!"
+                placeholder="Add new runner!"
                 onChangeText={newText => setName(newText)}
                 defaultValue={name}
             />
@@ -49,22 +51,14 @@ const App = () => {
                 color="#841584">
                 <Text style={styles.buttonText}>Add</Text> 
             </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.button, { marginTop: 10 }]}
-                onPress={startAllStopwatches}
-                title="Start All"
-                color="#841584">
-                <Text style={styles.buttonText}>Start All</Text> 
-            </TouchableOpacity>
             <SafeAreaView style={{flex: 1}}>        
                 <FlatList
                     data={runners}
                     getItemLayout={(item, index) => (
-                        {length: STOPWATCH_HEIGHT, offset: STOPWATCH_HEIGHT * index, index}
+                        {length: RUNNER_HEIGHT, offset: RUNNER_HEIGHT * index, index}
                     )}
                     renderItem={({ item }) => (
-                        <Stopwatch runnerName={item} 
-                        startExternally={startAll} 
+                        <Runner runnerName={item} 
                         onDelete={() => deleteRunner(item)} />
                     )}
                 />   

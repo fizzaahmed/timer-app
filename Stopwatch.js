@@ -1,19 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react'; 
 import { View, Text, StyleSheet, TouchableOpacity, FlatList }  
-    from 'react-native'; 
+    from 'react-native';
+import Icon from 'react-native-vector-icons/Feather'; // You can choose another icon set if preferred
 
-const timestamp = {
-    minutes: 0,
-    seconds: 0,
-    milliseconds: 0
-}
   
-const Stopwatch = ({runnerName, startExternally, onDelete}) => { 
+const Stopwatch = ({}) => { 
     // State and refs to manage time and stopwatch status 
     const [time, setTime] = useState(0); 
     const [minutes, setMinutes] = useState(0); 
     const [seconds, setSeconds] = useState(0); 
-    const [centiseconds, setCentiseconds] = useState(0); 
+    //const [centiseconds, setCentiseconds] = useState(0); 
     //const [timestamp, setTimeStamp] = useState({minutes: 0, seconds: 0, milliseconds: 0});
     const [running, setRunning] = useState(false);
     const [lapTimes, setLapTimes] = useState([]);
@@ -22,11 +18,11 @@ const Stopwatch = ({runnerName, startExternally, onDelete}) => {
     const startTimeRef = useRef({minutes: 0, seconds: 0, milliseconds: 0});
     const LAPTIME_HEIGHT = 10; 
 
-    useEffect(() => {
-        if (startExternally) {
-            startStopwatch();
-        }
-    }, [startExternally]);
+    // useEffect(() => {
+    //     if (startExternally) {
+    //         startStopwatch();
+    //     }
+    // }, [startExternally]);
 
     // Function to start the stopwatch 
     const startStopwatch = () => { 
@@ -41,28 +37,28 @@ const Stopwatch = ({runnerName, startExternally, onDelete}) => {
             setMinutes(thisMinutes);
             const thisSeconds = Math.floor((thisTime - thisMinutes * 6000) / 100);
             setSeconds(thisSeconds);
-            setCentiseconds((thisTime - thisMinutes * 6000) - thisSeconds * 100);
+            //setCentiseconds((thisTime - thisMinutes * 6000) - thisSeconds * 100);
         }, 10); // changing from  1000 to 10 to change interval every centisecond
         setRunning(true); 
     }; 
-    // Function to pause the stopwatch 
+    // Function to pause the stopwatch : pause = stop
     const pauseStopwatch = () => { 
         clearInterval(intervalRef.current); 
         setRunning(false);
     }; 
 
     // Function to lap the stopwatch
-    const lapStopwatch = () => {
-        const currentTime = minutes + ":" + seconds + ":" + centiseconds;
-        if (lapTimes.length == 0){
-            setLapTimes([currentTime]);
-        }
-        else {
-            const combinedTimes = lapTimes.concat([currentTime])
-            setLapTimes(combinedTimes);
-        }    
-        setHaveLapTimes(true);
-    };
+    // const lapStopwatch = () => {
+    //     const currentTime = minutes + ":" + seconds + ":" + centiseconds;
+    //     if (lapTimes.length == 0){
+    //         setLapTimes([currentTime]);
+    //     }
+    //     else {
+    //         const combinedTimes = lapTimes.concat([currentTime])
+    //         setLapTimes(combinedTimes);
+    //     }    
+    //     setHaveLapTimes(true);
+    // };
 
     // Function to reset the stopwatch 
     const resetStopwatch = () => { 
@@ -70,7 +66,7 @@ const Stopwatch = ({runnerName, startExternally, onDelete}) => {
         setTime(0); 
         setMinutes(0);
         setSeconds(0);
-        setCentiseconds(0);
+        //setCentiseconds(0);
         setRunning(false); 
         setLapTimes([]);
         setHaveLapTimes(false);
@@ -88,88 +84,63 @@ const Stopwatch = ({runnerName, startExternally, onDelete}) => {
             setMinutes(thisMinutes);
             const thisSeconds = Math.floor((thisTime - thisMinutes * 6000) / 100);
             setSeconds(thisSeconds);
-            setCentiseconds((thisTime - thisMinutes * 6000) - thisSeconds * 100);
+            //setCentiseconds((thisTime - thisMinutes * 6000) - thisSeconds * 100);
         }, 10); // changing from  1000 to 10 to change interval every centisecond
         setRunning(true);  
     }; 
+
+    const getTextFromTime = (time) => {
+        if (time < 10){
+            return "0" + time
+        }
+        else{
+            return time
+        }
+
+
+    };
   
     return ( 
         <View style={styles.container}>
-            <View style={styles.runnerTimeContainer}>  
-                <Text>Runner: {runnerName}</Text> 
-                <Text style={styles.timeText}>{minutes}:{seconds}:{centiseconds}</Text>
+            <View style={styles.circleRow}>
+                <View style={styles.circle}>
+                    <Text style={styles.timeText}>{getTextFromTime(minutes)}:{getTextFromTime(seconds)}</Text> 
+                </View>
             </View>
-            <View style={styles.lapTimesContainer}>
-                {haveLapTimes ? (
-                <FlatList
-                data={lapTimes}
-                getItemLayout={(laptime, index) => (
-                    {length: LAPTIME_HEIGHT, offset: LAPTIME_HEIGHT * index, index}
-                  )}
-                keyExtractor={(laptime, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                    <View style={styles.itemContainer}>
-                    <Text style={styles.laptime}>Lap {index + 1}: {item.toString()}</Text>
-                    </View>
-                )}
-                />)
-                :
-                (<></>)
-                }
-            </View>
-            
             <View style={styles.buttonContainer}> 
-                {running ? ( 
-                    <>
-                    <TouchableOpacity 
-                        style={[styles.button, styles.pauseButton]} 
-                        onPress={pauseStopwatch} 
-                    > 
-                        <Text style={styles.buttonText}>Pause</Text> 
-                    </TouchableOpacity> 
-                    <TouchableOpacity 
-                    style={[styles.button, styles.lapButton]} 
-                    onPress={lapStopwatch} 
-                    > 
-                    <Text style={styles.buttonText}>Lap</Text> 
-                    </TouchableOpacity>
-                    </>
-                    
-                ) : ( 
-                    <> 
-                        <TouchableOpacity 
-                            style={[styles.button, styles.startButton]} 
-                            onPress={startStopwatch} 
-                        > 
-                            <Text style={styles.buttonText}>Start</Text> 
-                        </TouchableOpacity> 
-                        <TouchableOpacity 
-                            style={[styles.button, styles.resetButton]} 
-                            onPress={resetStopwatch} 
-                        > 
-                            <Text style={styles.buttonText}> 
-                                Reset 
-                            </Text> 
-                        </TouchableOpacity> 
-                    </> 
-                )} 
-                {!running && ( 
-                    <TouchableOpacity 
-                        style={[styles.button, styles.resumeButton]} 
-                        onPress={resumeStopwatch} 
-                    > 
-                        <Text style={styles.buttonText}> 
-                            Resume 
-                        </Text> 
-                    </TouchableOpacity> 
-                )}
-                            {/* Delete Button */}
+            {running ? (
+                <>
             <TouchableOpacity 
-                style={[styles.button, styles.deleteButton]} 
-                onPress={onDelete} 
+                style={[styles.button, styles.pauseButton]} 
+                onPress={pauseStopwatch} 
             > 
-                <Text style={styles.buttonText}>Delete</Text> 
+            <Icon name={'square'} size={40} color="#000" />
             </TouchableOpacity>  
+            <TouchableOpacity 
+                style={[styles.button, styles.resetButton]} 
+                            onPress={resetStopwatch} 
+            > 
+            <Icon name={'rotate-ccw'} size={40} color="#000" />
+            </TouchableOpacity> 
+                </>
+             ) : (
+                <>
+            <TouchableOpacity 
+                style={[styles.button, styles.startButton]} 
+                onPress={startStopwatch} 
+             > 
+                <Icon name={'play'} size={40} color="#000" /> 
+            </TouchableOpacity> 
+            <TouchableOpacity 
+                style={[styles.button, styles.resetButton]} 
+                            onPress={resetStopwatch} 
+            > 
+            <Icon name={'rotate-ccw'} size={40} color="#000" />
+            </TouchableOpacity> 
+                </>
+
+             ) }
+            
             </View>
 
         </View> 
@@ -255,7 +226,20 @@ const styles = StyleSheet.create({
     buttonText: { 
         color: 'white', 
         fontSize: 16, 
-    }, 
+    },
+    circleRow: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    circle: {
+        width: 150, // Circle's diameter
+        height: 150, // Circle's diameter
+        borderRadius: 75, // Half of the width/height to make it circular
+        borderColor: 'black',
+        borderWidth: 3, // Border width,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }, 
 }); 
   
 export default Stopwatch;
